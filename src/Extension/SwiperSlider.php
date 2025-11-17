@@ -78,6 +78,19 @@ class SwiperSlider extends Extension
             $this->owner->Slides(),
             $gridConfig
         );
+
+        $fields->removeByName([
+            'Effect',
+            'Loop',
+            'Pagination',
+            'Navigation',
+            'Scrollbar',
+            'Lazy',
+            'Autoplay',
+            'AutoplayDelay',
+            'Speed',
+            'Slides'
+        ]);
         $fields->addFieldToTab('Root.HeroSlider', $slidesGrid);
 
         // Settings

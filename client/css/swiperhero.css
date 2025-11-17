@@ -1,28 +1,27 @@
-  .swiper {
+#Hero_Section .swiper {
       margin-bottom: 1rem;
       position: relative;
     }
-    .swiper-slide {
-        background: #f7f7f7;
+#Hero_Section .swiper-slide {
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
     }
-    .swiper-slide img {
+#Hero_Section .swiper-slide img {
         position: relative;
         object-fit: cover;
     }
-    .slide-content{
+#Hero_Section .slide-content{
         display: flex;
         position: absolute;
         width: 100%;
     }
-    .cover-link {
+#Hero_Section .cover-link {
     position: absolute; inset: 0;
     z-index: 1;
     }
-    .swiper-overlay {
+#Hero_Section .swiper-overlay {
         position: absolute;
         width: 100%;
         inset: 0;
@@ -54,24 +53,8 @@
     .swiper-h-tall   { height: 80vh; }
     }
 
-.swiper-button-container{
-    position: absolute;
-    bottom: 8%;
-    right: 2rem;
-    display: flex;
-    gap: 1rem;
-    width: 120px;
-}
 
-.swiper-button-prev, .swiper-button-next{
-    background-color: #fff;
-    padding: 10px;
-    border-radius: 50%;
-}
-
-
-.swiper-media, .swiper-media > video, .swiper-media > picture,
-.swiper-slide > picture, .swiper-slide > img {
+.swiper-media, .swiper-media > video {
   width: 100%; height: 700px;
 }
 .swiper-video { width: 100%; height: 100%; object-fit: cover; }

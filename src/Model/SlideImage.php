@@ -121,7 +121,7 @@ class SlideImage extends DataObject
             'MobileImage',
             UploadField::create('MobileImage', 'Mobile image')
                 ->setAllowedFileCategories('image/supported')
-                ->setFolderName('swiper/slides') // 🔧 keep folder consistent
+                ->setFolderName('swiper/slides')
                 ->setDescription('Optional; fallback is desktop image. Optimal 960×1024')
                 ->displayIf('MediaType')->isEqualTo('image')->end()
         );
@@ -247,26 +247,28 @@ class SlideImage extends DataObject
     {
         $result = parent::validate();
 
-        // Cover vs Buttons
         if ($this->CoverLinkID && $this->Links()->exists()) {
             $result->addError('Choose either a Cover Link or Buttons, not both.');
         }
 
-        // Minimal media requirements
         if ($this->MediaType === 'image' && !$this->ImageID) {
             $result->addError('Please upload a Desktop image (or switch Media type to Video).');
         }
-        if ($this->MediaType === 'video' && !$this->VideoMP4ID && !$this->VideoWebMID) {
+
+        if ($this->MediaType === 'video'
+            && !$this->VideoMP4ID
+            && !$this->VideoWebMID
+        ) {
             $result->addError('Please upload at least an MP4 or WebM for the video slide.');
         }
 
-        // Clip range sanity
         if ($this->VideoStart && $this->VideoEnd && $this->VideoEnd < $this->VideoStart) {
             $result->addError('Video End must be greater than or equal to Start.');
         }
 
         return $result;
     }
+
 
     // Helpers used by the template
     public function getIsVideo(): bool

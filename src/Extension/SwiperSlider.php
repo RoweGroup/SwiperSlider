@@ -57,7 +57,7 @@ class SwiperSlider extends Extension
             $fields->addFieldToTab('Root', Tab::create('HeroSlider'));
         }
 
-<<<<<<< HEAD
+
         // Slides grid (orderable)
         $gridConfig = GridFieldConfig_RelationEditor::create();
         $gridConfig->addComponent(new GridFieldOrderableRows('SortOrder'));
@@ -83,10 +83,10 @@ class SwiperSlider extends Extension
         $fields->addFieldToTab('Root.HeroSlider', $slidesGrid);
 
         // Settings
-=======
+
         $cfg = GridFieldConfig_RelationEditor::create();
         $cfg->addComponent(new GridFieldOrderableRows('SortOrder'));
->>>>>>> 73a3f8bfb7b1e2c486800e354e9196bade452f3e
+
         $fields->addFieldToTab('Root.HeroSlider',
             GridField::create('Slides', 'Slides', $this->owner->Slides(), $cfg)
         );

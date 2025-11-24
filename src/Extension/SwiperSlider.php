@@ -79,6 +79,7 @@ class SwiperSlider extends Extension
             'Lazy',
             'Autoplay',
             'AutoplayDelay',
+            'AutoplayProgress',
             'Speed',
             'Slides'
         ]);

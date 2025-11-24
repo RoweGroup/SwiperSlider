@@ -36,6 +36,7 @@ class SwiperSlider extends Extension
         'Autoplay'      => 'Boolean',
         'AutoplayDelay' => 'Int',
         'Lazy'          => 'Boolean',
+        'AutoplayProgress' => 'Boolean',
     ];
 
     private static $has_many = ['Slides' => SlideImage::class];
@@ -49,6 +50,7 @@ class SwiperSlider extends Extension
         $this->owner->Loop = true;
         $this->owner->Autoplay = true;
         $this->owner->AutoplayDelay = 5000;
+        $this->owner->AutoplayProgress = true;
     }
 
     public function updateCMSFields(FieldList $fields): void
@@ -103,6 +105,7 @@ class SwiperSlider extends Extension
                 CheckboxField::create('Scrollbar', 'Scrollbar'),
                 CheckboxField::create('Lazy', 'Lazy images'),
                 CheckboxField::create('Autoplay', 'Autoplay'),
+                CheckboxField::create('AutoplayProgress', 'Show autoplay progress'),
                 NumericField::create('AutoplayDelay', 'Autoplay delay (ms)'),
                 NumericField::create('Speed', 'Transition speed (ms)'),
             ])->setStartClosed(false)

@@ -1,6 +1,6 @@
 <% if $HasSlides %>
   <% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
-<div class="swiper" 
+<div class="hero swiper" 
     id="slider-$ID" 
     data-element-carousel 
     data-swiper='{$getSwiperOptionsJSON.RAW}'
@@ -8,7 +8,7 @@
   <div class="swiper-wrapper">
     <% if $SlidesActive.Exists %>
     <% loop $SlidesActive %>
-      <div class="swiper-slide">
+      <div class="swiper-slide swiper-{$Theme}">
         <% if $CoverLink %>
           <a class="cover-link" href="$CoverLink.URL" aria-label="$CoverLink.Title.XML"></a>
         <% end_if %>
@@ -82,7 +82,7 @@
 
         <div class="slide-content">
           <div class="grid-container" style="width: 100%;">
-            <div class="grid-x swiper-{$Theme} align-middle <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
+            <div class="grid-x align-middle <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
               <div class="cell large-shrink small-12">
                 <% if $Headline %><h2>$Headline</h2><% end_if %>
                 <% if $Description %><p>$Description</p><% end_if %>
@@ -110,6 +110,14 @@
       <div class="swiper-button-next"></div>
     </div>
   <% end_if %>
+  <% if $Autoplay && $AutoplayProgress %>
+        <div class="autoplay-progress">
+            <svg viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20"></circle>
+            </svg>
+            <span></span>
+        </div>
+    <% end_if %>
   <% if $Scrollbar %><div class="swiper-scrollbar"></div><% end_if %>
 </div>
 <% end_if %>

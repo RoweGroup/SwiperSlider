@@ -1,13 +1,3 @@
-    .swiper-dark {
-        --overlay-bg: #000;
-        --overlay: 0;
-        --color: #fff;
-    }
-    .swiper-light {
-        --overlay-bg: #fff;
-        --overlay: 0;
-        --color: #111;
-    }
     .hero .swiper {
       margin-bottom: 1rem;
       position: relative;
@@ -35,18 +25,28 @@
         transform 0.6s ease 0.3s;
         pointer-events: none;
     }
-
     .hero .swiper-slide-active .slide-content, .hero .swiper-slide-duplicate-active .slide-content 
     { 
         opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
     }
-
     .cover-link {
     position: absolute; inset: 0;
     z-index: 1;
     }
+
+    .swiper-dark {
+        --overlay-bg: #000;
+        --overlay: 0;
+        --color: #fff;
+    }
+    .swiper-light {
+        --overlay-bg: #fff;
+        --overlay: 0;
+        --color: #111;
+    }
+
     .swiper-overlay {
         position: absolute;
         width: 100%;
@@ -54,7 +54,6 @@
         background: var(--overlay-bg, #000);
         opacity: var(--overlay, .35);
     }
-    
     /* HEIGHT MODIFIERS */
     .swiper-h-auto   { height: auto; }
     .swiper-h-short  { height: 30vh; }
@@ -69,22 +68,7 @@
     .swiper-h-tall   { height: 80vh; }
     }
 
-/* .swiper-button-container{
-    position: absolute;
-    bottom: 8%;
-    right: 2rem;
-    display: flex;
-    gap: 1rem;
-    width: 120px;
-} */
-
-.swiper-button-prev, .swiper-button-next{
-    background-color: #fff;
-    padding: .75rem;
-    color: var(--color, #111);
-}
-
-.autoplay-progress {
+    .autoplay-progress {
       position: absolute;
       right: 1rem;
       bottom: 1rem;
@@ -116,9 +100,9 @@
       transform: rotate(-90deg);
     }
 
-.swiper-media, .swiper-media > video, .swiper-media > picture,
-.swiper-slide > picture, .swiper-slide > img {
-  width: 100%; height: 700px;
-}
-.swiper-video { width: 100%; height: 100%; object-fit: cover; }
+    .swiper-media, .swiper-media > video, .swiper-media > picture,
+    .swiper-slide > picture, .swiper-slide > img {
+        width: 100%; height: 700px;
+    }
+    .swiper-video { width: 100%; height: 100%; object-fit: cover; }
 

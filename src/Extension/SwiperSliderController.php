@@ -25,6 +25,23 @@ class SwiperSliderController extends Extension
             if (!el || el.__swiperInit) return;
             el.__swiperInit = true;
             var options = $options;
+
+            var progressWrap = el.querySelector('.autoplay-progress');
+            if (options.autoplay && progressWrap) {
+              var progressCircle  = progressWrap.querySelector('svg');
+              var progressContent = progressWrap.querySelector('span');
+
+              options.on = options.on || {};
+              options.on.autoplayTimeLeft = function (swiper, time, progress) {
+                if (progressCircle) {
+                  progressCircle.style.setProperty('--progress', 1 - progress);
+                }
+                if (progressContent) {
+                  progressContent.textContent = Math.ceil(time / 1000) + 's';
+                }
+              };
+            }
+
             if (window.Swiper) new Swiper(el, options);
           }
 

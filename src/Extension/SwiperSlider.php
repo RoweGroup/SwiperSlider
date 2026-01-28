@@ -16,7 +16,7 @@ use SilverStripe\ORM\DataList;
 
 class SwiperSlider extends Extension
 {
-    private static $db = [
+     private static $db = [
         'Effect'        => "Enum('slide,fade,coverflow,flip,cube,creative,cards','slide')",
         'Loop'          => 'Boolean',
         'Speed'         => 'Int',
@@ -26,53 +26,33 @@ class SwiperSlider extends Extension
         'Autoplay'      => 'Boolean',
         'AutoplayDelay' => 'Int',
         'Lazy'          => 'Boolean',
+        'AutoplayProgress' => 'Boolean',
     ];
 
-    private static $has_many = [
-        'Slides' => SlideImage::class,
-    ];
-
-    private static $owns = [
-        'Slides',
-    ];
+    private static $has_many = ['Slides' => SlideImage::class];
+    private static $owns     = ['Slides'];
 
     public function populateDefaults(): void
     {
-        $this->owner->Speed         = 600;
-        $this->owner->Pagination    = true;
-        $this->owner->Navigation    = true;
-        $this->owner->Loop          = true;
-        $this->owner->Autoplay      = true;
+        $this->owner->Speed = 600;
+        $this->owner->Pagination = true;
+        $this->owner->Navigation = true;
+        $this->owner->Loop = true;
+        $this->owner->Autoplay = true;
         $this->owner->AutoplayDelay = 5000;
-
-        parent::populateDefaults();
+        $this->owner->AutoplayProgress = true;
     }
 
     public function updateCMSFields(FieldList $fields): void
     {
-        // Ensure HeroSlider tab exists
         if (!$fields->fieldByName('Root.HeroSlider')) {
             $fields->addFieldToTab('Root', Tab::create('HeroSlider'));
         }
 
-        // Remove any scaffolded fields so we control layout
-        $fields->removeByName([
-            'Slides',
-            'Effect',
-            'Loop',
-            'Speed',
-            'Pagination',
-            'Navigation',
-            'Scrollbar',
-            'Autoplay',
-            'AutoplayDelay',
-            'Lazy',
-        ]);
 
-        // Slides GridField (single, orderable)
+        // Slides grid (orderable)
         $gridConfig = GridFieldConfig_RelationEditor::create();
         $gridConfig->addComponent(new GridFieldOrderableRows('SortOrder'));
-
         $slidesGrid = GridField::create(
             'Slides',
             'Slides',
@@ -80,37 +60,46 @@ class SwiperSlider extends Extension
             $gridConfig
         );
 
+        $fields->removeByName([
+            'Effect',
+            'Loop',
+            'Pagination',
+            'Navigation',
+            'Scrollbar',
+            'Lazy',
+            'Autoplay',
+            'AutoplayDelay',
+            'AutoplayProgress',
+            'Speed',
+            'Slides'
+        ]);
         $fields->addFieldToTab('Root.HeroSlider', $slidesGrid);
 
-        // Slider Settings – IMPORTANT: FieldList::create(), not a raw array
-        $sliderSettingsFields = FieldList::create(
-            DropdownField::create('Effect', 'Effect', [
-                'slide'    => 'Slide',
-                'fade'     => 'Fade',
-                'coverflow'=> 'Coverflow',
-                'flip'     => 'Flip',
-                'cube'     => 'Cube',
-                'creative' => 'Creative',
-                'cards'    => 'Cards',
-            ]),
-            CheckboxField::create('Loop', 'Loop'),
-            CheckboxField::create('Pagination', 'Pagination'),
-            CheckboxField::create('Navigation', 'Navigation (prev/next)'),
-            CheckboxField::create('Scrollbar', 'Scrollbar'),
-            CheckboxField::create('Lazy', 'Lazy images'),
-            CheckboxField::create('Autoplay', 'Autoplay'),
-            NumericField::create('AutoplayDelay', 'Autoplay delay (ms)'),
-            NumericField::create('Speed', 'Transition speed (ms)')
-                ->setDescription('Transition duration in ms')
+        // Settings
+
+        $cfg = GridFieldConfig_RelationEditor::create();
+        $cfg->addComponent(new GridFieldOrderableRows('SortOrder'));
+
+        $fields->addFieldToTab('Root.HeroSlider',
+            GridField::create('Slides', 'Slides', $this->owner->Slides(), $cfg)
         );
 
-        $fields->addFieldToTab(
-            'Root.HeroSlider',
-            ToggleCompositeField::create(
-                'SliderSettings',
-                'Slider Settings',
-                $sliderSettingsFields
-            )->setStartClosed(false)
+        $fields->addFieldToTab('Root.HeroSlider',
+            ToggleCompositeField::create('SliderSettings', 'Slider Settings', [
+                DropdownField::create('Effect', 'Effect', [
+                    'slide'=>'Slide','fade'=>'Fade','coverflow'=>'Coverflow','flip'=>'Flip',
+                    'cube'=>'Cube','creative'=>'Creative','cards'=>'Cards',
+                ]),
+                CheckboxField::create('Loop', 'Loop'),
+                CheckboxField::create('Pagination', 'Pagination'),
+                CheckboxField::create('Navigation', 'Navigation (prev/next)'),
+                CheckboxField::create('Scrollbar', 'Scrollbar'),
+                CheckboxField::create('Lazy', 'Lazy images'),
+                CheckboxField::create('Autoplay', 'Autoplay'),
+                CheckboxField::create('AutoplayProgress', 'Show autoplay progress'),
+                NumericField::create('AutoplayDelay', 'Autoplay delay (ms)'),
+                NumericField::create('Speed', 'Transition speed (ms)'),
+            ])->setStartClosed(false)
         );
     }
 
@@ -118,47 +107,17 @@ class SwiperSlider extends Extension
     {
         $o = [
             'effect' => $this->owner->Effect ?: 'slide',
-            'loop'   => (bool) $this->owner->Loop,
-            'speed'  => (int) ($this->owner->Speed ?: 600),
+            'loop'   => (bool)$this->owner->Loop,
+            'speed'  => (int)($this->owner->Speed ?: 600),
         ];
-
-        if ($this->owner->Pagination) {
-            $o['pagination'] = [
-                'el'        => '.swiper-pagination',
-                'clickable' => true,
-            ];
-        }
-
-        if ($this->owner->Navigation) {
-            $o['navigation'] = [
-                'nextEl' => '.swiper-button-next',
-                'prevEl' => '.swiper-button-prev',
-            ];
-        }
-
-        if ($this->owner->Scrollbar) {
-            $o['scrollbar'] = [
-                'el'   => '.swiper-scrollbar',
-                'hide' => false,
-            ];
-        }
-
-        if ($this->owner->Autoplay) {
-            $o['autoplay'] = [
-                'delay'               => (int) ($this->owner->AutoplayDelay ?: 5000),
-                'disableOnInteraction'=> false,
-                'pauseOnMouseEnter'   => true,
-            ];
-        }
-
+        if ($this->owner->Pagination) $o['pagination'] = ['el'=>'.swiper-pagination','clickable'=>true];
+        if ($this->owner->Navigation) $o['navigation'] = ['nextEl'=>'.swiper-button-next','prevEl'=>'.swiper-button-prev'];
+        if ($this->owner->Scrollbar)  $o['scrollbar']  = ['el'=>'.swiper-scrollbar','hide'=>false];
+        if ($this->owner->Autoplay)   $o['autoplay']   = ['delay'=>(int)($this->owner->AutoplayDelay ?: 5000),'disableOnInteraction'=>false,'pauseOnMouseEnter'=>true];
         if ($this->owner->Lazy) {
             $o['preloadImages'] = false;
-            $o['lazy'] = [
-                'loadPrevNext'          => true,
-                'loadOnTransitionStart' => true,
-            ];
+            $o['lazy'] = ['loadPrevNext'=>true,'loadOnTransitionStart'=>true];
         }
-
         return $o;
     }
 
@@ -176,9 +135,7 @@ class SwiperSlider extends Extension
     public function getSlidesActive(): DataList
     {
         $list = $this->owner->Slides();
-        if (!$list) {
-            return SlideImage::get()->where('1 = 0');
-        }
+        if (!$list) return SlideImage::get()->where('1 = 0');
         return $list->where(SlideImage::activeFilterSQL());
     }
 }

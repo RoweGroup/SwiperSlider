@@ -41,9 +41,9 @@
                 <source media="(min-width: 1024px)" data-srcset="$Image.FocusFill(2000,800).URL">
                 <source media="(min-width: 640px)"  data-srcset="$Image.FocusFill(1400,700).URL">
                 <% if $MobileImage %>
-                  <source media="(max-width: 639px)" data-srcset="$MobileImage.FocusFill(960,1024).URL">
+                  <source media="(max-width: 639px)" data-srcset="$MobileImage.FocusFill(1200,1200).URL">
                 <% else %>
-                  <source media="(max-width: 639px)" data-srcset="$Image.FocusFill(960,1024).URL">
+                  <source media="(max-width: 639px)" data-srcset="$Image.FocusFill(1200,1200).URL">
                 <% end_if %>
                 <img
                   class="swiper-lazy swiper-h-{$Up.Height}"
@@ -59,9 +59,9 @@
                 <source media="(min-width: 1024px)" srcset="$Image.FocusFill(2000,800).URL">
                 <source media="(min-width: 640px)"  srcset="$Image.FocusFill(1400,700).URL">
                 <% if $MobileImage %>
-                  <source media="(max-width: 639px)" srcset="$MobileImage.FocusFill(960,1024).URL">
+                  <source media="(max-width: 639px)" srcset="$MobileImage.FocusFill(1200,1200).URL">
                 <% else %>
-                  <source media="(max-width: 639px)" srcset="$Image.FocusFill(960,1024).URL">
+                  <source media="(max-width: 639px)" srcset="$Image.FocusFill(1200,1200).URL">
                 <% end_if %>
                 <img
                   class="swiper-h-{$Up.Height}"

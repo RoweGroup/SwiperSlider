@@ -16,6 +16,7 @@ use SilverStripe\LinkField\Form\MultiLinkField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Core\Validation\ValidationResult;
+use Antlion\SwiperSlider\Elements\ElementSwiperSlider;
 
 class SlideImage extends DataObject
 {
@@ -43,8 +44,9 @@ class SlideImage extends DataObject
         'VideoMP4'    => File::class,
         'VideoWebM'   => File::class,
         'VideoPoster' => Image::class,
-        'Parent'      => SiteTree::class,
         'CoverLink'   => Link::class,
+        'Parent'      => SiteTree::class,
+        'SliderElement' => ElementSwiperSlider::class,
     ];
 
     private static $has_many = [

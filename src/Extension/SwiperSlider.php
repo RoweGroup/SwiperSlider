@@ -29,7 +29,10 @@ class SwiperSlider extends Extension
         'AutoplayProgress' => 'Boolean',
     ];
 
-    private static $has_many = ['Slides' => SlideImage::class];
+    private static $has_many = [
+        'Slides' => SlideImage::class . '.Parent',
+        ];
+        
     private static $owns     = ['Slides'];
 
     public function populateDefaults(): void

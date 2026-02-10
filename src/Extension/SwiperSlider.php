@@ -2,7 +2,6 @@
 namespace Antlion\SwiperSlider\Extension;
 
 use Antlion\SwiperSlider\Model\SlideImage;
-use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FieldGroup;
@@ -24,7 +23,7 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
-class SwiperSlider extends Extension
+class SwiperSlider extends DataExtension
 {
      private static $db = [
         'Effect'        => "Enum('slide,fade,coverflow,flip,cube,creative,cards','slide')",
@@ -55,14 +54,21 @@ class SwiperSlider extends Extension
 
     public function updateCMSFields(FieldList $fields): void
     {
+        // Ensure tab exists
         if (!$fields->fieldByName('Root.HeroSlider')) {
             $fields->addFieldToTab('Root', Tab::create('HeroSlider'));
         }
 
+        // Remove auto-generated fields (so we control layout)
+        $fields->removeByName([
+            'Effect','Loop','Pagination','Navigation','Scrollbar','Lazy',
+            'Autoplay','AutoplayDelay','AutoplayProgress','Speed','Slides','SliderSettings'
+        ]);
 
-        // Slides grid (orderable)
+        // Slides grid (single instance)
         $gridConfig = GridFieldConfig_RelationEditor::create();
         $gridConfig->addComponent(new GridFieldOrderableRows('SortOrder'));
+
         $slidesGrid = GridField::create(
             'Slides',
             'Slides',
@@ -70,31 +76,11 @@ class SwiperSlider extends Extension
             $gridConfig
         );
 
-        $fields->removeByName([
-            'Effect',
-            'Loop',
-            'Pagination',
-            'Navigation',
-            'Scrollbar',
-            'Lazy',
-            'Autoplay',
-            'AutoplayDelay',
-            'AutoplayProgress',
-            'Speed',
-            'Slides'
-        ]);
         $fields->addFieldToTab('Root.HeroSlider', $slidesGrid);
 
-        // Settings
-
-        $cfg = GridFieldConfig_RelationEditor::create();
-        $cfg->addComponent(new GridFieldOrderableRows('SortOrder'));
-
-        $fields->addFieldToTab('Root.HeroSlider',
-            GridField::create('Slides', 'Slides', $this->owner->Slides(), $cfg)
-        );
-
-        $fields->addFieldToTab('Root.HeroSlider',
+        // Settings (single instance)
+        $fields->addFieldToTab(
+            'Root.HeroSlider',
             ToggleCompositeField::create('SliderSettings', 'Slider Settings', [
                 DropdownField::create('Effect', 'Effect', [
                     'slide'=>'Slide','fade'=>'Fade','coverflow'=>'Coverflow','flip'=>'Flip',

@@ -15,7 +15,7 @@ use SilverStripe\LinkField\Form\LinkField;
 use SilverStripe\LinkField\Form\MultiLinkField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\Core\Validation\ValidationResult;
+use SilverStripe\ORM\ValidationResult;
 
 class SlideImage extends DataObject
 {
@@ -229,8 +229,8 @@ class SlideImage extends DataObject
 
     public static function activeFilterSQL(): string
     {
-        return '("StartDate" IS NULL OR "StartDate" <= CURRENT_DATE())'
-             . ' AND ("EndDate" IS NULL OR "EndDate" >= CURRENT_DATE())';
+        return "(StartDate IS NULL OR StartDate <= CURDATE())"
+            . " AND (EndDate IS NULL OR EndDate >= CURDATE())";
     }
 
     public function onBeforeWrite()

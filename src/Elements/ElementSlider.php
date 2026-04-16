@@ -1,0 +1,157 @@
+<?php
+
+namespace Antlion\SwiperSlider\Elements;
+
+use Antlion\SwiperSlider\Model\SlideImage;
+use DNADesign\Elemental\Models\BaseElement;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\ToggleCompositeField;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
+use SilverStripe\ORM\DataList;
+
+class ElementSlider extends BaseElement
+{
+    private static $table_name = 'ElementSlider';
+    private static $description = 'Swiper Slider';
+    private static $singular_name = 'Slider';
+    private static $plural_name = 'Sliders';
+    private static $icon = 'font-icon-block-carousel';
+
+    private static $controller_class = ElementSliderController::class;
+
+    private static $inline_editable = false;
+
+    private static $db = [
+        'Effect'           => "Enum('slide,fade,coverflow,flip,cube,creative,cards','slide')",
+        'Loop'             => 'Boolean',
+        'Speed'            => 'Int',
+        'Pagination'       => 'Boolean',
+        'Navigation'       => 'Boolean',
+        'Scrollbar'        => 'Boolean',
+        'Autoplay'         => 'Boolean',
+        'AutoplayDelay'    => 'Int',
+        'Lazy'             => 'Boolean',
+        'AutoplayProgress' => 'Boolean',
+    ];
+
+    private static $has_many = [
+        'Slides' => SlideImage::class,
+    ];
+
+    private static $owns = [
+        'Slides',
+    ];
+
+    public function populateDefaults(): void
+    {
+        parent::populateDefaults();
+        $this->Speed            = 600;
+        $this->Pagination       = true;
+        $this->Navigation       = true;
+        $this->Loop             = true;
+        $this->Autoplay         = true;
+        $this->AutoplayDelay    = 5000;
+        $this->AutoplayProgress = true;
+    }
+
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+
+        $fields->removeByName([
+            'Effect',
+            'Loop',
+            'Speed',
+            'Pagination',
+            'Navigation',
+            'Scrollbar',
+            'Autoplay',
+            'AutoplayDelay',
+            'Lazy',
+            'AutoplayProgress',
+            'Slides',
+        ]);
+
+        $gridConfig = GridFieldConfig_RelationEditor::create();
+        $gridConfig->addComponent(new GridFieldOrderableRows('SortOrder'));
+        $fields->addFieldToTab('Root.Main', GridField::create(
+            'Slides',
+            'Slides',
+            $this->Slides(),
+            $gridConfig
+        ));
+
+        $fields->addFieldToTab('Root.Main',
+            ToggleCompositeField::create(
+                'SliderSettings',
+                'Slider Settings',
+                [
+                    DropdownField::create('Effect', 'Transition effect', [
+                        'slide'     => 'Slide',
+                        'fade'      => 'Fade',
+                        'coverflow' => 'Coverflow',
+                        'flip'      => 'Flip',
+                        'cube'      => 'Cube',
+                        'creative'  => 'Creative',
+                        'cards'     => 'Cards',
+                    ]),
+
+                    CheckboxField::create('Loop',             'Loop'),
+                    CheckboxField::create('Pagination',       'Pagination'),
+                    CheckboxField::create('Navigation',       'Navigation (prev/next arrows)'),
+                    CheckboxField::create('Scrollbar',        'Scrollbar'),
+                    CheckboxField::create('Lazy',             'Lazy load images'),
+                    CheckboxField::create('Autoplay',         'Autoplay'),
+                    CheckboxField::create('AutoplayProgress', 'Show autoplay progress indicator'),
+                    NumericField::create('AutoplayDelay', 'Autoplay delay (ms)')
+                        ->setDescription('Used only when Autoplay is enabled.'),
+                    NumericField::create('Speed', 'Transition speed (ms)'),
+                ]
+            )->setStartClosed(false)
+        );
+
+        return $fields;
+    }
+
+    public function getType(): string
+    {
+        return _t(__CLASS__ . '.BlockType', 'Slider');
+    }
+
+    public function getSwiperOptions(): array
+    {
+        $o = [
+            'effect' => $this->Effect ?: 'slide',
+            'loop'   => (bool) $this->Loop,
+            'speed'  => (int) ($this->Speed ?: 600),
+        ];
+        if ($this->Pagination) $o['pagination'] = ['el' => '.swiper-pagination', 'clickable' => true];
+        if ($this->Navigation) $o['navigation'] = ['nextEl' => '.swiper-button-next', 'prevEl' => '.swiper-button-prev'];
+        if ($this->Scrollbar)  $o['scrollbar']  = ['el' => '.swiper-scrollbar', 'hide' => false];
+        if ($this->Autoplay)   $o['autoplay']   = ['delay' => (int) ($this->AutoplayDelay ?: 5000), 'disableOnInteraction' => false, 'pauseOnMouseEnter' => true];
+        if ($this->Lazy) {
+            $o['preloadImages'] = false;
+            $o['lazy'] = ['loadPrevNext' => true, 'loadOnTransitionStart' => true];
+        }
+        return $o;
+    }
+
+    public function getSwiperOptionsJSON(): string
+    {
+        return json_encode($this->getSwiperOptions(), JSON_UNESCAPED_SLASHES);
+    }
+
+    public function getHasSlides(): bool
+    {
+        return $this->Slides()->exists();
+    }
+
+    public function getSlidesActive(): DataList
+    {
+        return $this->Slides()->where(SlideImage::activeFilterSQL());
+    }
+}

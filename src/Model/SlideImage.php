@@ -16,6 +16,7 @@ use SilverStripe\LinkField\Form\MultiLinkField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Core\Validation\ValidationResult;
+use Antlion\SwiperSlider\Elements\ElementSlider;
 
 class SlideImage extends DataObject
 {
@@ -45,6 +46,7 @@ class SlideImage extends DataObject
         'VideoPoster' => Image::class,
         'Parent'      => SiteTree::class,
         'CoverLink'   => Link::class,
+        'ElementSlider'   => ElementSlider::class,
     ];
 
     private static $has_many = [
@@ -97,6 +99,7 @@ class SlideImage extends DataObject
             'CoverLinkID',
             'VideoStart',
             'VideoEnd',
+            'ElementSlider'
         ]);
 
         // Media toggle (before image)

@@ -1,12 +1,10 @@
 <% if $HasSlides %>
-  <% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
-<div class="hero swiper" 
-    id="slider-$ID" 
-    data-element-carousel 
+<% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
+<div class="hero swiper"
+    id="slider-$ID"
     data-swiper='{$getSwiperOptionsJSON.RAW}'
 >
   <div class="swiper-wrapper">
-    <% if $SlidesActive.Exists %>
     <% loop $SlidesActive %>
       <div class="swiper-slide swiper-{$Theme}">
         <% if $CoverLink %>
@@ -14,7 +12,6 @@
         <% end_if %>
 
         <% if $IsVideo %>
-          <!-- VIDEO -->
           <div class="swiper-media">
             <video
               class="swiper-video swiper-h-{$Up.Height}"
@@ -33,10 +30,8 @@
             </video>
           </div>
         <% else %>
-          <!-- IMAGE (lazy/eager as before) -->
           <% if $Image %>
-            <% if $Lazy %>
-              <!-- LAZY -->
+            <% if $Up.Lazy %>
               <picture>
                 <source media="(min-width: 1024px)" data-srcset="$Image.FocusFill(2000,800).URL">
                 <source media="(min-width: 640px)"  data-srcset="$Image.FocusFill(1400,700).URL">
@@ -54,7 +49,6 @@
               </picture>
               <div class="swiper-lazy-preloader"></div>
             <% else %>
-              <!-- EAGER -->
               <picture>
                 <source media="(min-width: 1024px)" srcset="$Image.FocusFill(2000,800).URL">
                 <source media="(min-width: 640px)"  srcset="$Image.FocusFill(1400,700).URL">
@@ -100,7 +94,6 @@
         </div>
       </div>
     <% end_loop %>
-    <% end_if %>
   </div>
 
   <% if $Pagination %><div class="swiper-pagination"></div><% end_if %>
@@ -111,13 +104,13 @@
     </div>
   <% end_if %>
   <% if $Autoplay && $AutoplayProgress %>
-        <div class="autoplay-progress">
-            <svg viewBox="0 0 48 48">
-              <circle cx="24" cy="24" r="20"></circle>
-            </svg>
-            <span></span>
-        </div>
-    <% end_if %>
+    <div class="autoplay-progress">
+      <svg viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="20"></circle>
+      </svg>
+      <span></span>
+    </div>
+  <% end_if %>
   <% if $Scrollbar %><div class="swiper-scrollbar"></div><% end_if %>
 </div>
 <% end_if %>

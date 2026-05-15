@@ -1,10 +1,12 @@
 <% if $HasSlides %>
-<% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
+  <% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
 <div class="hero swiper"
     id="slider-$ID"
+    data-element-carousel
     data-swiper='{$getSwiperOptionsJSON.RAW}'
 >
   <div class="swiper-wrapper">
+    <% if $SlidesActive.Exists %>
     <% loop $SlidesActive %>
       <div class="swiper-slide swiper-{$Theme}">
         <% if $CoverLink %>
@@ -12,6 +14,7 @@
         <% end_if %>
 
         <% if $IsVideo %>
+          <!-- VIDEO -->
           <div class="swiper-media">
             <video
               class="swiper-video swiper-h-{$Up.Height}"
@@ -30,38 +33,29 @@
             </video>
           </div>
         <% else %>
+          <!-- IMAGE (lazy/eager as before) -->
           <% if $Image %>
-            <% if $Up.Lazy %>
+            <% if $Lazy %>
+              <!-- LAZY -->
               <picture>
-                <source media="(min-width: 1024px)" data-srcset="$Image.FocusFill(2000,800).URL">
-                <source media="(min-width: 640px)"  data-srcset="$Image.FocusFill(1400,700).URL">
-                <% if $MobileImage %>
-                  <source media="(max-width: 639px)" data-srcset="$MobileImage.FocusFill(1200,1200).URL">
-                <% else %>
-                  <source media="(max-width: 639px)" data-srcset="$Image.FocusFill(1200,1200).URL">
-                <% end_if %>
+                <source media="(max-width: 639px)" data-srcset="$MobileImageURL">
                 <img
                   class="swiper-lazy swiper-h-{$Up.Height}"
-                  data-src="$Image.FocusFill(1400,700).URL"
+                  data-src="$DesktopImageURL"
                   alt="$Image.Title.ATT"
-                  width="1400" height="700"
+                  width="$Up.DesktopWidth" height="$Up.DesktopHeight"
                   style="width:100%;height:100%;object-fit:cover;object-position:center;">
               </picture>
               <div class="swiper-lazy-preloader"></div>
             <% else %>
+              <!-- EAGER -->
               <picture>
-                <source media="(min-width: 1024px)" srcset="$Image.FocusFill(2000,800).URL">
-                <source media="(min-width: 640px)"  srcset="$Image.FocusFill(1400,700).URL">
-                <% if $MobileImage %>
-                  <source media="(max-width: 639px)" srcset="$MobileImage.FocusFill(1200,1200).URL">
-                <% else %>
-                  <source media="(max-width: 639px)" srcset="$Image.FocusFill(1200,1200).URL">
-                <% end_if %>
+                <source media="(max-width: 639px)" srcset="$MobileImageURL">
                 <img
                   class="swiper-h-{$Up.Height}"
-                  src="$Image.FocusFill(1400,700).URL"
+                  src="$DesktopImageURL"
                   alt="$Image.Title.ATT"
-                  width="1400" height="700"
+                  width="$Up.DesktopWidth" height="$Up.DesktopHeight"
                   style="width:100%;height:100%;object-fit:cover;object-position:center;">
               </picture>
             <% end_if %>
@@ -75,25 +69,28 @@
         <% end_if %>
 
         <div class="slide-content">
-          <div class="grid-container" style="width: 100%;">
+          <div class="grid-container fluid" style="width: 100%;">
             <div class="grid-x align-middle <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
-              <div class="cell large-shrink small-12">
-                <% if $Headline %><h2>$Headline</h2><% end_if %>
-                <% if $Description %><p>$Description</p><% end_if %>
-                $Content
-                <% if $Links.Exists %>
-                  <div class="button-group gap-6 large <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
-                    <% loop $Links %>
-                      <a class="button $CssClass" href="$URL" <% if $OpenInNew %>target="_blank" rel="noopener noreferrer"<% end_if %>>$Title.XML</a>
-                    <% end_loop %>
-                  </div>
+              <div class="cell large-<% if $Align == 'center' %>8<% else %>5<% end_if %> small-12">
+                <div class="<% if $ContentBg %>dark-overlay p-40<% end_if %>">
+                    <% if $Headline %><h2>$Headline</h2><% end_if %>
+                    <% if $Description %><p>$Description</p><% end_if %>
+                    $Content
+                    <% if $Links.Exists %>
+                    <div class="button-group gap-6 large <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
+                        <% loop $Links %>
+                        <a class="button $CssClass" href="$URL" <% if $OpenInNew %>target="_blank" rel="noopener noreferrer"<% end_if %>>$Title.XML</a>
+                        <% end_loop %>
+                    </div>
                 <% end_if %>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     <% end_loop %>
+    <% end_if %>
   </div>
 
   <% if $Pagination %><div class="swiper-pagination"></div><% end_if %>
@@ -104,13 +101,13 @@
     </div>
   <% end_if %>
   <% if $Autoplay && $AutoplayProgress %>
-    <div class="autoplay-progress">
-      <svg viewBox="0 0 48 48">
-        <circle cx="24" cy="24" r="20"></circle>
-      </svg>
-      <span></span>
-    </div>
-  <% end_if %>
+        <div class="autoplay-progress">
+            <svg viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20"></circle>
+            </svg>
+            <span></span>
+        </div>
+    <% end_if %>
   <% if $Scrollbar %><div class="swiper-scrollbar"></div><% end_if %>
 </div>
 <% end_if %>

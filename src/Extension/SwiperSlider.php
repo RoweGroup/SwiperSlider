@@ -7,6 +7,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\ToggleCompositeField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\GridField\GridField;
@@ -27,6 +28,10 @@ class SwiperSlider extends Extension
         'AutoplayDelay' => 'Int',
         'Lazy'          => 'Boolean',
         'AutoplayProgress' => 'Boolean',
+        'DesktopWidth'  => 'Int',
+        'DesktopHeight' => 'Int',
+        'MobileWidth'   => 'Int',
+        'MobileHeight'  => 'Int',
     ];
 
     private static $has_many = ['Slides' => SlideImage::class];
@@ -41,6 +46,10 @@ class SwiperSlider extends Extension
         $this->owner->Autoplay = true;
         $this->owner->AutoplayDelay = 5000;
         $this->owner->AutoplayProgress = true;
+        $this->owner->DesktopWidth = 1920;
+        $this->owner->DesktopHeight = 700;
+        $this->owner->MobileWidth = 960;
+        $this->owner->MobileHeight = 1024;
     }
 
     public function updateCMSFields(FieldList $fields): void
@@ -71,7 +80,11 @@ class SwiperSlider extends Extension
             'AutoplayDelay',
             'AutoplayProgress',
             'Speed',
-            'Slides'
+            'Slides',
+            'DesktopWidth',
+            'DesktopHeight',
+            'MobileWidth',
+            'MobileHeight',
         ]);
         $fields->addFieldToTab('Root.HeroSlider', $slidesGrid);
 
@@ -99,6 +112,14 @@ class SwiperSlider extends Extension
                 CheckboxField::create('AutoplayProgress', 'Show autoplay progress'),
                 NumericField::create('AutoplayDelay', 'Autoplay delay (ms)'),
                 NumericField::create('Speed', 'Transition speed (ms)'),
+                FieldGroup::create('Desktop dimensions',
+                    NumericField::create('DesktopWidth', 'Width (px)'),
+                    NumericField::create('DesktopHeight', 'Height (px)')
+                )->setName('DesktopDimensions'),
+                FieldGroup::create('Mobile dimensions',
+                    NumericField::create('MobileWidth', 'Width (px)'),
+                    NumericField::create('MobileHeight', 'Height (px)')
+                )->setName('MobileDimensions'),
             ])->setStartClosed(false)
         );
     }

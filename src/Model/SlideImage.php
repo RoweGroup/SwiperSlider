@@ -10,6 +10,7 @@ use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\LinkField\Models\Link;
 use SilverStripe\LinkField\Form\LinkField;
 use SilverStripe\LinkField\Form\MultiLinkField;
@@ -30,6 +31,7 @@ class SlideImage extends DataObject
         'Theme'          => 'Enum("light,dark","dark")',
         'Align'          => 'Enum("center,left,right","left")',
         'OverlayOpacity' => 'Int',
+        'ContentBg'      => 'Boolean',
         'StartDate'      => 'Date',
         'EndDate'        => 'Date',
         'SortOrder'      => 'Int',
@@ -94,6 +96,7 @@ class SlideImage extends DataObject
             'Theme',
             'Align',
             'OverlayOpacity',
+            'ContentBg',
             'StartDate',
             'EndDate',
             'CoverLinkID',
@@ -117,7 +120,7 @@ class SlideImage extends DataObject
             UploadField::create('Image', 'Desktop image')
                 ->setAllowedFileCategories('image/supported')
                 ->setFolderName('swiper/slides')
-                ->setDescription('Optimal 2000×800')
+                ->setDescription('Optimal 1920x700')
                 ->displayIf('MediaType')->isEqualTo('image')->end()
         );
         $fields->replaceField(
@@ -163,7 +166,9 @@ class SlideImage extends DataObject
                     'center' => 'Center',
                 ]),
                 NumericField::create('OverlayOpacity', 'Overlay opacity (0–100)')
-                    ->setDescription('Typical: 0–70')
+                    ->setDescription('Typical: 0–70'),
+                CheckboxField::create('ContentBg', 'Add Content Background Overlay')
+                    ->setDescription('Add background for content'),
             )->setName('AppearanceGroup')->addExtraClass('stack')
         );
 
@@ -284,5 +289,44 @@ class SlideImage extends DataObject
         return $this->VideoPoster()->exists()
             ? $this->VideoPoster()->Fill(2000, 800)->getURL()
             : null;
+    }
+
+    public function getDesktopImageURL(): string
+    {
+        if (!$this->Image()->exists()) return '';
+        [$w, $h] = $this->resolveDesktopDimensions();
+        return $this->Image()->FocusFill($w, $h)->getURL();
+    }
+
+    public function getMobileImageURL(): string
+    {
+        $img = $this->MobileImage()->exists() ? $this->MobileImage() : $this->Image();
+        if (!$img->exists()) return '';
+        [$w, $h] = $this->resolveMobileDimensions();
+        return $img->FocusFill($w, $h)->getURL();
+    }
+
+    private function resolveDesktopDimensions(): array
+    {
+        if ($this->ElementSliderID && $this->ElementSlider()->exists()) {
+            $s = $this->ElementSlider();
+            return [(int)($s->DesktopWidth ?: 1920), (int)($s->DesktopHeight ?: 700)];
+        }
+        if ($this->ParentID && ($p = $this->Parent()) && $p->exists()) {
+            return [(int)($p->DesktopWidth ?: 1920), (int)($p->DesktopHeight ?: 700)];
+        }
+        return [1920, 700];
+    }
+
+    private function resolveMobileDimensions(): array
+    {
+        if ($this->ElementSliderID && $this->ElementSlider()->exists()) {
+            $s = $this->ElementSlider();
+            return [(int)($s->MobileWidth ?: 960), (int)($s->MobileHeight ?: 1024)];
+        }
+        if ($this->ParentID && ($p = $this->Parent()) && $p->exists()) {
+            return [(int)($p->MobileWidth ?: 960), (int)($p->MobileHeight ?: 1024)];
+        }
+        return [960, 1024];
     }
 }

@@ -7,6 +7,7 @@ use DNADesign\Elemental\Models\BaseElement;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\ToggleCompositeField;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
@@ -36,6 +37,10 @@ class ElementSlider extends BaseElement
         'AutoplayDelay'    => 'Int',
         'Lazy'             => 'Boolean',
         'AutoplayProgress' => 'Boolean',
+        'DesktopWidth'     => 'Int',
+        'DesktopHeight'    => 'Int',
+        'MobileWidth'      => 'Int',
+        'MobileHeight'     => 'Int',
     ];
 
     private static $has_many = [
@@ -56,6 +61,10 @@ class ElementSlider extends BaseElement
         $this->Autoplay         = true;
         $this->AutoplayDelay    = 5000;
         $this->AutoplayProgress = true;
+        $this->DesktopWidth     = 1920;
+        $this->DesktopHeight    = 700;
+        $this->MobileWidth      = 960;
+        $this->MobileHeight     = 1024;
     }
 
     public function getCMSFields()
@@ -74,6 +83,10 @@ class ElementSlider extends BaseElement
             'Lazy',
             'AutoplayProgress',
             'Slides',
+            'DesktopWidth',
+            'DesktopHeight',
+            'MobileWidth',
+            'MobileHeight',
         ]);
 
         $gridConfig = GridFieldConfig_RelationEditor::create();
@@ -110,6 +123,14 @@ class ElementSlider extends BaseElement
                     NumericField::create('AutoplayDelay', 'Autoplay delay (ms)')
                         ->setDescription('Used only when Autoplay is enabled.'),
                     NumericField::create('Speed', 'Transition speed (ms)'),
+                    FieldGroup::create('Desktop dimensions',
+                        NumericField::create('DesktopWidth', 'Width (px)'),
+                        NumericField::create('DesktopHeight', 'Height (px)')
+                    )->setName('DesktopDimensions'),
+                    FieldGroup::create('Mobile dimensions',
+                        NumericField::create('MobileWidth', 'Width (px)'),
+                        NumericField::create('MobileHeight', 'Height (px)')
+                    )->setName('MobileDimensions'),
                 ]
             )->setStartClosed(false)
         );

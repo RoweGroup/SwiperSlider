@@ -33,35 +33,23 @@
           <% if $Image %>
             <% if $Up.Lazy %>
               <picture>
-                <source media="(min-width: 1024px)" data-srcset="$Image.FocusFill(2000,800).URL">
-                <source media="(min-width: 640px)"  data-srcset="$Image.FocusFill(1400,700).URL">
-                <% if $MobileImage %>
-                  <source media="(max-width: 639px)" data-srcset="$MobileImage.FocusFill(1200,1200).URL">
-                <% else %>
-                  <source media="(max-width: 639px)" data-srcset="$Image.FocusFill(1200,1200).URL">
-                <% end_if %>
+                <source media="(max-width: 639px)" data-srcset="$MobileImageURL">
                 <img
                   class="swiper-lazy swiper-h-{$Up.Height}"
-                  data-src="$Image.FocusFill(1400,700).URL"
+                  data-src="$DesktopImageURL"
                   alt="$Image.Title.ATT"
-                  width="1400" height="700"
+                  width="$Up.DesktopWidth" height="$Up.DesktopHeight"
                   style="width:100%;height:100%;object-fit:cover;object-position:center;">
               </picture>
               <div class="swiper-lazy-preloader"></div>
             <% else %>
               <picture>
-                <source media="(min-width: 1024px)" srcset="$Image.FocusFill(2000,800).URL">
-                <source media="(min-width: 640px)"  srcset="$Image.FocusFill(1400,700).URL">
-                <% if $MobileImage %>
-                  <source media="(max-width: 639px)" srcset="$MobileImage.FocusFill(1200,1200).URL">
-                <% else %>
-                  <source media="(max-width: 639px)" srcset="$Image.FocusFill(1200,1200).URL">
-                <% end_if %>
+                <source media="(max-width: 639px)" srcset="$MobileImageURL">
                 <img
                   class="swiper-h-{$Up.Height}"
-                  src="$Image.FocusFill(1400,700).URL"
+                  src="$DesktopImageURL"
                   alt="$Image.Title.ATT"
-                  width="1400" height="700"
+                  width="$Up.DesktopWidth" height="$Up.DesktopHeight"
                   style="width:100%;height:100%;object-fit:cover;object-position:center;">
               </picture>
             <% end_if %>

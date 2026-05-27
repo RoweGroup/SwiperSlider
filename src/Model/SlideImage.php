@@ -15,7 +15,8 @@ use SilverStripe\LinkField\Form\LinkField;
 use SilverStripe\LinkField\Form\MultiLinkField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\Core\Validation\ValidationResult;
+use SilverStripe\ORM\ValidationResult;
+// use SilverStripe\Core\Validation\ValidationResult;
 
 class SlideImage extends DataObject
 {

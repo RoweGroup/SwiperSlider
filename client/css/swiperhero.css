@@ -25,8 +25,8 @@
         transform 0.6s ease 0.3s;
         pointer-events: none;
     }
-    .hero .swiper-slide-active .slide-content, .hero .swiper-slide-duplicate-active .slide-content 
-    { 
+    .hero .swiper-slide-active .slide-content, .hero .swiper-slide-duplicate-active .slide-content
+    {
         opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
@@ -52,7 +52,8 @@
         width: 100%;
         inset: 0;
         background: var(--overlay-bg, #000);
-        opacity: var(--overlay, .35);
+        opacity: var(--overlay, .0);
+        z-index: 1;
     }
     /* HEIGHT MODIFIERS */
     .swiper-h-auto   { height: auto; }

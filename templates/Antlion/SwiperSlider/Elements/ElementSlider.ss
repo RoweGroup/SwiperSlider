@@ -1,6 +1,6 @@
 <% if $HasSlides %>
   <% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
-<div class="hero swiper"
+<div class="hero swiper <% if $ExtraClass %> $ExtraClass<% end_if %>"
     id="slider-$ID"
     data-element-carousel
     data-swiper='{$getSwiperOptionsJSON.RAW}'

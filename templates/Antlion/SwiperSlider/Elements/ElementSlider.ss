@@ -1,5 +1,6 @@
 <% if $HasSlides %>
   <% require css('antlion/swiper-slider:client/css/swiperhero.css') %>
+<% cached $SlidesCacheKey %>
 <div class="hero swiper <% if $ExtraClass %> $ExtraClass<% end_if %>"
     id="slider-$ID"
     data-element-carousel
@@ -110,4 +111,5 @@
     <% end_if %>
   <% if $Scrollbar %><div class="swiper-scrollbar"></div><% end_if %>
 </div>
+<% end_cached %>
 <% end_if %>

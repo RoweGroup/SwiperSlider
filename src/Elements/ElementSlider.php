@@ -13,6 +13,7 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\FieldType\DBDatetime;
 
 class ElementSlider extends BaseElement
 {
@@ -174,5 +175,25 @@ class ElementSlider extends BaseElement
     public function getSlidesActive(): DataList
     {
         return $this->Slides()->where(SlideImage::activeFilterSQL());
+    }
+
+    /**
+     * Cache key for the front-end render: changes whenever this element's own
+     * settings change, the slide list is added to/removed/reordered/edited,
+     * or the calendar day rolls over (slides can be scheduled by date, so a
+     * key that never changes would freeze which slides are "active").
+     */
+    public function getSlidesCacheKey(): string
+    {
+        $slides = $this->Slides()->sort('SortOrder');
+
+        return md5(implode('|', [
+            $this->ID,
+            $this->LastEdited,
+            $slides->count(),
+            implode('-', $slides->column('ID')),
+            $slides->max('LastEdited'),
+            DBDatetime::now()->Format('y-MM-dd'),
+        ]));
     }
 }

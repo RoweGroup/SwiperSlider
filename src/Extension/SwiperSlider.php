@@ -14,6 +14,7 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\FieldType\DBDatetime;
 
 class SwiperSlider extends Extension
 {
@@ -158,5 +159,26 @@ class SwiperSlider extends Extension
         $list = $this->owner->Slides();
         if (!$list) return SlideImage::get()->where('1 = 0');
         return $list->where(SlideImage::activeFilterSQL());
+    }
+
+    /**
+     * Cache key for the front-end render: changes whenever the owner's own
+     * settings change, the slide list is added to/removed/reordered/edited,
+     * or the calendar day rolls over (slides can be scheduled by date, so a
+     * key that never changes would freeze which slides are "active").
+     */
+    public function getSlidesCacheKey(): string
+    {
+        $owner  = $this->owner;
+        $slides = $owner->Slides();
+
+        return md5(implode('|', [
+            $owner->ID,
+            $owner->LastEdited,
+            $slides ? $slides->count() : 0,
+            $slides ? implode('-', $slides->column('ID')) : '',
+            $slides ? $slides->max('LastEdited') : '',
+            DBDatetime::now()->Format('y-MM-dd'),
+        ]));
     }
 }

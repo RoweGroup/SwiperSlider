@@ -287,7 +287,7 @@ class SlideImage extends DataObject
     public function getPosterURL(): ?string
     {
         return $this->VideoPoster()->exists()
-            ? $this->VideoPoster()->Fill(2000, 800)->getURL()
+            ? $this->VideoPoster()->Fill(2000, 800)->WebP()->getURL()
             : null;
     }
 
@@ -295,7 +295,7 @@ class SlideImage extends DataObject
     {
         if (!$this->Image()->exists()) return '';
         [$w, $h] = $this->resolveDesktopDimensions();
-        return $this->Image()->FocusFill($w, $h)->getURL();
+        return $this->Image()->FocusFill($w, $h)->WebP()->getURL();
     }
 
     public function getMobileImageURL(): string
@@ -303,7 +303,7 @@ class SlideImage extends DataObject
         $img = $this->MobileImage()->exists() ? $this->MobileImage() : $this->Image();
         if (!$img->exists()) return '';
         [$w, $h] = $this->resolveMobileDimensions();
-        return $img->FocusFill($w, $h)->getURL();
+        return $img->FocusFill($w, $h)->WebP()->getURL();
     }
 
     private function resolveDesktopDimensions(): array

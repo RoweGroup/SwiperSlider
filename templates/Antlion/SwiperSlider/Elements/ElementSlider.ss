@@ -72,7 +72,7 @@
         <div class="slide-content">
           <div class="grid-container" style="width: 100%;">
             <div class="grid-x align-middle <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
-              <div class="cell large-<% if $Align == 'center' %>8<% else %>shrink<% end_if %> small-12">
+              <div class="cell large-<% if $Align == 'center' %>12<% else %>shrink<% end_if %> small-12">
                 <div class="<% if $ContentBg %>dark-overlay p-40<% end_if %>">
                     <% if $Headline %><h2>$Headline</h2><% end_if %>
                     <% if $Description %><p>$Description</p><% end_if %>

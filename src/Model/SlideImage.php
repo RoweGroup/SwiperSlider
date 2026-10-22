@@ -2,6 +2,7 @@
 namespace Antlion\SwiperSlider\Model;
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Permission;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\File;
 use SilverStripe\AssetAdmin\Forms\UploadField;
@@ -328,5 +329,34 @@ class SlideImage extends DataObject
             return [(int)($p->MobileWidth ?: 960), (int)($p->MobileHeight ?: 1024)];
         }
         return [960, 1024];
+    }
+
+    public function canView($member = null)
+    {
+        return $this->extendedCan(__FUNCTION__, $member) ?? $this->parentCan(__FUNCTION__, $member);
+    }
+
+    public function canEdit($member = null)
+    {
+        return $this->extendedCan(__FUNCTION__, $member) ?? $this->parentCan(__FUNCTION__, $member);
+    }
+
+    public function canDelete($member = null)
+    {
+        return $this->extendedCan(__FUNCTION__, $member) ?? $this->parentCan(__FUNCTION__, $member);
+    }
+
+    public function canCreate($member = null, $context = [])
+    {
+        return $this->extendedCan(__FUNCTION__, $member, $context) ?? Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
+    }
+
+    /**
+     * Slides follow the permissions of their slider block, or the page they were added to directly.
+     */
+    private function parentCan(string $method, $member): bool
+    {
+        $parent = $this->ElementSlider()->exists() ? $this->ElementSlider() : $this->Parent();
+        return $parent->exists() ? $parent->$method($member) : Permission::check('CMS_ACCESS_CMSMain', 'any', $member);
     }
 }

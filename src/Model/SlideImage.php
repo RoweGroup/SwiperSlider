@@ -12,6 +12,7 @@ use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\CheckboxField;
+use TractorCow\Colorpicker\Forms\ColorField;
 use SilverStripe\LinkField\Models\Link;
 use SilverStripe\LinkField\Form\LinkField;
 use SilverStripe\LinkField\Form\MultiLinkField;
@@ -32,6 +33,7 @@ class SlideImage extends DataObject
         'Theme'          => 'Enum("light,dark","dark")',
         'Align'          => 'Enum("center,left,right","left")',
         'OverlayOpacity' => 'Int',
+        'OverlayColor'   => 'Varchar(20)',
         'ContentBg'      => 'Boolean',
         'StartDate'      => 'Date',
         'EndDate'        => 'Date',
@@ -97,6 +99,7 @@ class SlideImage extends DataObject
             'Theme',
             'Align',
             'OverlayOpacity',
+            'OverlayColor',
             'ContentBg',
             'StartDate',
             'EndDate',
@@ -168,6 +171,8 @@ class SlideImage extends DataObject
                 ]),
                 NumericField::create('OverlayOpacity', 'Overlay opacity (0–100)')
                     ->setDescription('Typical: 0–70'),
+                ColorField::create('OverlayColor', 'Overlay color')
+                    ->setDescription('Optional. Defaults to black for the Dark theme, white for Light.'),
                 CheckboxField::create('ContentBg', 'Add Content Background Overlay')
                     ->setDescription('Add background for content'),
             )->setName('AppearanceGroup')->addExtraClass('stack')
@@ -222,6 +227,34 @@ class SlideImage extends DataObject
     {
         $pct = max(0, min(100, (int)$this->OverlayOpacity));
         return (string) round($pct / 100, 2);
+    }
+
+    /**
+     * Inline style for .swiper-overlay: opacity, plus the color when one is set
+     * (otherwise the Theme's --overlay-bg applies).
+     */
+    public function OverlayStyle(): string
+    {
+        $parts = [];
+        if ($this->OverlayOpacity) {
+            $parts[] = '--overlay: ' . $this->OverlayOpacityCss();
+        }
+        if ($color = $this->OverlayColorCss()) {
+            $parts[] = '--overlay-bg: ' . $color;
+        }
+        return $parts ? implode('; ', $parts) . ';' : '';
+    }
+
+    /**
+     * OverlayColor as "#rrggbb", or empty when unset or not a valid hex color.
+     */
+    public function OverlayColorCss(): string
+    {
+        $hex = ltrim(trim((string)$this->OverlayColor), '#');
+        if (strlen($hex) === 3) {
+            $hex = "{$hex[0]}{$hex[0]}{$hex[1]}{$hex[1]}{$hex[2]}{$hex[2]}";
+        }
+        return preg_match('/^[0-9a-fA-F]{6}$/', $hex) ? '#' . $hex : '';
     }
 
     public function IsActive(): bool
@@ -287,9 +320,19 @@ class SlideImage extends DataObject
 
     public function getPosterURL(): ?string
     {
-        return $this->VideoPoster()->exists()
-            ? $this->VideoPoster()->Fill(2000, 800)->getURL()
-            : null;
+        if (!$this->VideoPoster()->exists()) return null;
+        [$w, $h] = $this->resolveDesktopDimensions();
+        return $this->VideoPoster()->FocusFill($w, $h)->getURL();
+    }
+
+    /**
+     * CSS custom properties so video slides keep the slider's desktop/mobile aspect ratios.
+     */
+    public function getMediaAspectStyle(): string
+    {
+        [$dw, $dh] = $this->resolveDesktopDimensions();
+        [$mw, $mh] = $this->resolveMobileDimensions();
+        return sprintf('--ar-desktop: %d / %d; --ar-mobile: %d / %d;', $dw, $dh, $mw, $mh);
     }
 
     public function getDesktopImageURL(): string

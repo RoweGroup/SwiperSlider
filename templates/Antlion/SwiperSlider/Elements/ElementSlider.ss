@@ -16,7 +16,7 @@
 
         <% if $IsVideo %>
           <!-- VIDEO -->
-          <div class="swiper-media">
+          <div class="swiper-media swiper-media--video" style="$MediaAspectStyle">
             <video
               class="swiper-video swiper-h-{$Up.Height}"
               autoplay
@@ -63,11 +63,7 @@
           <% end_if %>
         <% end_if %>
 
-        <% if $OverlayOpacity %>
-          <div class="swiper-overlay" style="--overlay: {$OverlayOpacityCss};"></div>
-        <% else %>
-          <div class="swiper-overlay"></div>
-        <% end_if %>
+        <div class="swiper-overlay"<% if $OverlayStyle %> style="$OverlayStyle"<% end_if %>></div>
 
         <div class="slide-content">
           <div class="grid-container" style="width: 100%;">

@@ -16,7 +16,7 @@
 
         <% if $IsVideo %>
           <!-- VIDEO -->
-          <div class="swiper-media">
+          <div class="swiper-media swiper-media--video" style="$MediaAspectStyle">
             <video
               class="swiper-video swiper-h-{$Up.Height}"
               autoplay
@@ -63,22 +63,18 @@
           <% end_if %>
         <% end_if %>
 
-        <% if $OverlayOpacity %>
-          <div class="swiper-overlay" style="--overlay: {$OverlayOpacityCss};"></div>
-        <% else %>
-          <div class="swiper-overlay"></div>
-        <% end_if %>
+        <div class="swiper-overlay"<% if $OverlayStyle %> style="$OverlayStyle"<% end_if %>></div>
 
         <div class="slide-content">
           <div class="grid-container fluid" style="width: 100%;">
             <div class="grid-x align-middle <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
-              <div class="cell large-<% if $Align == 'center' %>12<% else %>5<% end_if %> small-12">
+              <div class="cell large-<% if $Align == 'center' %>12<% else %>6<% end_if %> small-12">
                 <div class="<% if $ContentBg %>dark-overlay p-40<% end_if %>">
                     <% if $Headline %><h2>$Headline</h2><% end_if %>
                     <% if $Description %><p>$Description</p><% end_if %>
                     $Content
                     <% if $Links.Exists %>
-                    <div class="button-group gap-6 large <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
+                    <div class="button-group <% if $Align == 'center' %>align-center<% else_if $Align == 'right' %>align-right<% else %>align-left<% end_if %>">
                         <% loop $Links %>
                         <a class="button $CssClass" href="$URL" <% if $OpenInNew %>target="_blank" rel="noopener noreferrer"<% end_if %>>$Title.XML</a>
                         <% end_loop %>

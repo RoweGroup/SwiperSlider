@@ -13,6 +13,7 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\CheckboxField;
 use TractorCow\Colorpicker\Forms\ColorField;
+use UncleCheese\DisplayLogic\Forms\Wrapper;
 use SilverStripe\LinkField\Models\Link;
 use SilverStripe\LinkField\Form\LinkField;
 use SilverStripe\LinkField\Form\MultiLinkField;
@@ -32,8 +33,16 @@ class SlideImage extends DataObject
         'Content'        => 'HTMLText',
         'Theme'          => 'Enum("light,dark","dark")',
         'Align'          => 'Enum("center,left,right","left")',
+        'OverlayType'    => 'Enum("none,solid,gradient","solid")',
         'OverlayOpacity' => 'Int',
         'OverlayColor'   => 'Varchar(20)',
+        'GradientDirection'     => 'Enum("right,left,bottom,top,bottom-right,bottom-left,top-right,top-left","right")',
+        'GradientStartColor'    => 'Varchar(20)',
+        'GradientStartOpacity'  => 'Int',
+        'GradientStartPosition' => 'Int',
+        'GradientEndColor'      => 'Varchar(20)',
+        'GradientEndOpacity'    => 'Int',
+        'GradientEndPosition'   => 'Int',
         'ContentBg'      => 'Boolean',
         'StartDate'      => 'Date',
         'EndDate'        => 'Date',
@@ -41,6 +50,17 @@ class SlideImage extends DataObject
         'MediaType'      => 'Enum("image,video","image")',
         'VideoStart'     => 'Int',   // seconds
         'VideoEnd'       => 'Int',   // seconds (0 = full)
+    ];
+
+    private static $defaults = [
+        'OverlayType'           => 'solid',
+        'GradientDirection'     => 'right',
+        'GradientStartColor'    => '000000',
+        'GradientStartOpacity'  => 80,
+        'GradientStartPosition' => 0,
+        'GradientEndColor'      => '000000',
+        'GradientEndOpacity'    => 0,
+        'GradientEndPosition'   => 100,
     ];
 
     private static $has_one = [
@@ -98,8 +118,16 @@ class SlideImage extends DataObject
             'ParentID',
             'Theme',
             'Align',
+            'OverlayType',
             'OverlayOpacity',
             'OverlayColor',
+            'GradientDirection',
+            'GradientStartColor',
+            'GradientStartOpacity',
+            'GradientStartPosition',
+            'GradientEndColor',
+            'GradientEndOpacity',
+            'GradientEndPosition',
             'ContentBg',
             'StartDate',
             'EndDate',
@@ -169,14 +197,54 @@ class SlideImage extends DataObject
                     'right'  => 'Right',
                     'center' => 'Center',
                 ]),
-                NumericField::create('OverlayOpacity', 'Overlay opacity (0–100)')
-                    ->setDescription('Typical: 0–70'),
-                ColorField::create('OverlayColor', 'Overlay color')
-                    ->setDescription('Optional. Defaults to black for the Dark theme, white for Light.'),
                 CheckboxField::create('ContentBg', 'Add Content Background Overlay')
                     ->setDescription('Add background for content'),
             )->setName('AppearanceGroup')->addExtraClass('stack')
         );
+
+        // Overlay: none, a solid color, or a gradient
+        $fields->addFieldsToTab('Root.Main', [
+            DropdownField::create('OverlayType', 'Overlay', [
+                'none'     => 'None',
+                'solid'    => 'Solid color',
+                'gradient' => 'Gradient',
+            ]),
+            Wrapper::create(
+                FieldGroup::create(
+                    'Solid overlay',
+                    NumericField::create('OverlayOpacity', 'Opacity (0–100)')
+                        ->setDescription('Typical: 0–70'),
+                    ColorField::create('OverlayColor', 'Color')
+                        ->setDescription('Optional. Defaults to black for the Dark theme, white for Light.')
+                )->setName('SolidOverlayGroup')
+            )->displayIf('OverlayType')->isEqualTo('solid')->end(),
+            Wrapper::create(
+                DropdownField::create('GradientDirection', 'Gradient direction', [
+                    'right'        => 'Left → Right',
+                    'left'         => 'Right → Left',
+                    'bottom'       => 'Top → Bottom',
+                    'top'          => 'Bottom → Top',
+                    'bottom-right' => 'Top left → Bottom right',
+                    'bottom-left'  => 'Top right → Bottom left',
+                    'top-right'    => 'Bottom left → Top right',
+                    'top-left'     => 'Bottom right → Top left',
+                ])->setDescription('The gradient runs from its start color to its end color in this direction.'),
+                FieldGroup::create(
+                    'Gradient start',
+                    ColorField::create('GradientStartColor', 'Color'),
+                    NumericField::create('GradientStartOpacity', 'Opacity (0–100)'),
+                    NumericField::create('GradientStartPosition', 'Position (0–100%)')
+                )->setName('GradientStartGroup')
+                    ->setDescription('Position is where the fade begins; before it the start color is solid.'),
+                FieldGroup::create(
+                    'Gradient end',
+                    ColorField::create('GradientEndColor', 'Color'),
+                    NumericField::create('GradientEndOpacity', 'Opacity (0–100)'),
+                    NumericField::create('GradientEndPosition', 'Position (0–100%)')
+                )->setName('GradientEndGroup')
+                    ->setDescription('Position is where the fade ends; after it the end color is solid.')
+            )->displayIf('OverlayType')->isEqualTo('gradient')->end(),
+        ]);
 
         // Schedule
         $fields->addFieldToTab(
@@ -230,11 +298,24 @@ class SlideImage extends DataObject
     }
 
     /**
-     * Inline style for .swiper-overlay: opacity, plus the color when one is set
-     * (otherwise the Theme's --overlay-bg applies).
+     * Whether the slide renders a .swiper-overlay at all.
+     */
+    public function ShowOverlay(): bool
+    {
+        return $this->OverlayType !== 'none';
+    }
+
+    /**
+     * Inline style for .swiper-overlay. Solid: opacity, plus the color when one is set
+     * (otherwise the Theme's --overlay-bg applies). Gradient: a linear-gradient background
+     * at full opacity, since each end carries its own alpha.
      */
     public function OverlayStyle(): string
     {
+        if ($this->OverlayType === 'gradient') {
+            return '--overlay: 1; background: ' . $this->GradientCss() . ';';
+        }
+
         $parts = [];
         if ($this->OverlayOpacity) {
             $parts[] = '--overlay: ' . $this->OverlayOpacityCss();
@@ -250,11 +331,51 @@ class SlideImage extends DataObject
      */
     public function OverlayColorCss(): string
     {
-        $hex = ltrim(trim((string)$this->OverlayColor), '#');
+        $rgb = $this->hexToRgb((string)$this->OverlayColor);
+        return $rgb ? vsprintf('#%02x%02x%02x', $rgb) : '';
+    }
+
+    /**
+     * e.g. "linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%)"
+     */
+    public function GradientCss(): string
+    {
+        $direction = 'to ' . str_replace('-', ' ', $this->GradientDirection ?: 'right');
+
+        return sprintf(
+            'linear-gradient(%s, %s %d%%, %s %d%%)',
+            $direction,
+            $this->gradientStop((string)$this->GradientStartColor, (int)$this->GradientStartOpacity),
+            $this->clampPercent($this->GradientStartPosition),
+            $this->gradientStop((string)$this->GradientEndColor, (int)$this->GradientEndOpacity),
+            $this->clampPercent($this->GradientEndPosition)
+        );
+    }
+
+    /**
+     * rgba() for one end of the gradient; an unset color falls back to black.
+     */
+    private function gradientStop(string $hex, int $opacity): string
+    {
+        [$r, $g, $b] = $this->hexToRgb($hex) ?: [0, 0, 0];
+        return sprintf('rgba(%d, %d, %d, %s)', $r, $g, $b, round($this->clampPercent($opacity) / 100, 2));
+    }
+
+    private function clampPercent($value): int
+    {
+        return max(0, min(100, (int)$value));
+    }
+
+    private function hexToRgb(string $hex): ?array
+    {
+        $hex = ltrim(trim($hex), '#');
         if (strlen($hex) === 3) {
             $hex = "{$hex[0]}{$hex[0]}{$hex[1]}{$hex[1]}{$hex[2]}{$hex[2]}";
         }
-        return preg_match('/^[0-9a-fA-F]{6}$/', $hex) ? '#' . $hex : '';
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            return null;
+        }
+        return [hexdec(substr($hex, 0, 2)), hexdec(substr($hex, 2, 2)), hexdec(substr($hex, 4, 2))];
     }
 
     public function IsActive(): bool
@@ -283,6 +404,9 @@ class SlideImage extends DataObject
             $this->EndDate = $this->StartDate;
         }
         $this->OverlayOpacity = max(0, min(100, (int)$this->OverlayOpacity));
+        foreach (['GradientStartOpacity', 'GradientStartPosition', 'GradientEndOpacity', 'GradientEndPosition'] as $field) {
+            $this->$field = $this->clampPercent($this->$field);
+        }
     }
 
     public function validate(): ValidationResult

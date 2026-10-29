@@ -63,7 +63,9 @@
           <% end_if %>
         <% end_if %>
 
-        <div class="swiper-overlay"<% if $OverlayStyle %> style="$OverlayStyle"<% end_if %>></div>
+        <% if $ShowOverlay %>
+          <div class="swiper-overlay"<% if $OverlayStyle %> style="$OverlayStyle"<% end_if %>></div>
+        <% end_if %>
 
         <div class="slide-content">
           <div class="grid-container" style="width: 100%;">

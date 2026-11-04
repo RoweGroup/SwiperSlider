@@ -108,7 +108,7 @@ class SwiperSlider extends Extension
                 CheckboxField::create('Pagination', 'Pagination'),
                 CheckboxField::create('Navigation', 'Navigation (prev/next)'),
                 CheckboxField::create('Scrollbar', 'Scrollbar'),
-                CheckboxField::create('Lazy', 'Lazy images'),
+                CheckboxField::create('Lazy', 'Lazy load images'),
                 CheckboxField::create('Autoplay', 'Autoplay'),
                 CheckboxField::create('AutoplayProgress', 'Show autoplay progress'),
                 NumericField::create('AutoplayDelay', 'Autoplay delay (ms)'),

@@ -38,6 +38,7 @@ class ElementSlider extends BaseElement
         'AutoplayDelay'    => 'Int',
         'Lazy'             => 'Boolean',
         'AutoplayProgress' => 'Boolean',
+        'PauseOnMouseEnter' => 'Boolean(1)',
         'DesktopWidth'     => 'Int',
         'DesktopHeight'    => 'Int',
         'MobileWidth'      => 'Int',
@@ -62,6 +63,7 @@ class ElementSlider extends BaseElement
         $this->Autoplay         = true;
         $this->AutoplayDelay    = 5000;
         $this->AutoplayProgress = true;
+        $this->PauseOnMouseEnter = true;
         $this->DesktopWidth     = 1920;
         $this->DesktopHeight    = 700;
         $this->MobileWidth      = 960;
@@ -83,6 +85,7 @@ class ElementSlider extends BaseElement
             'AutoplayDelay',
             'Lazy',
             'AutoplayProgress',
+            'PauseOnMouseEnter',
             'Slides',
             'DesktopWidth',
             'DesktopHeight',
@@ -121,6 +124,7 @@ class ElementSlider extends BaseElement
                     CheckboxField::create('Lazy',             'Lazy load images'),
                     CheckboxField::create('Autoplay',         'Autoplay'),
                     CheckboxField::create('AutoplayProgress', 'Show autoplay progress indicator'),
+                    CheckboxField::create('PauseOnMouseEnter', 'Pause autoplay on hover'),
                     NumericField::create('AutoplayDelay', 'Autoplay delay (ms)')
                         ->setDescription('Used only when Autoplay is enabled.'),
                     NumericField::create('Speed', 'Transition speed (ms)'),
@@ -154,7 +158,7 @@ class ElementSlider extends BaseElement
         if ($this->Pagination) $o['pagination'] = ['el' => '.swiper-pagination', 'clickable' => true];
         if ($this->Navigation) $o['navigation'] = ['nextEl' => '.swiper-button-next', 'prevEl' => '.swiper-button-prev'];
         if ($this->Scrollbar)  $o['scrollbar']  = ['el' => '.swiper-scrollbar', 'hide' => false];
-        if ($this->Autoplay)   $o['autoplay']   = ['delay' => (int) ($this->AutoplayDelay ?: 5000), 'disableOnInteraction' => false, 'pauseOnMouseEnter' => true];
+        if ($this->Autoplay)   $o['autoplay']   = ['delay' => (int) ($this->AutoplayDelay ?: 5000), 'disableOnInteraction' => false, 'pauseOnMouseEnter' => (bool) $this->PauseOnMouseEnter];
         if ($this->Lazy) {
             $o['preloadImages'] = false;
             $o['lazy'] = ['loadPrevNext' => true, 'loadOnTransitionStart' => true];

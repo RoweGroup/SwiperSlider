@@ -146,6 +146,16 @@ class SwiperSlider extends Extension
         if ($this->owner->Scrollbar)  $o['scrollbar']  = ['el'=>'.swiper-scrollbar','hide'=>false];
         if ($this->owner->Autoplay)   $o['autoplay']   = ['delay'=>(int)($this->owner->AutoplayDelay ?: 5000),'disableOnInteraction'=>false,'pauseOnMouseEnter'=>(bool)$this->owner->PauseOnMouseEnter];
         if ($this->owner->Autoplay && $this->owner->PauseButton) $o['pauseButton'] = true; // theme JS adds a pause/play button
+
+        // keyboard + screen reader support (WCAG 2.1.1, 4.1.2): theme JS adds arrow-key control
+        // and holds autoplay while keyboard focus is inside; Swiper labels it as a carousel region
+        $o['keyboardControl'] = true;
+        $o['a11y'] = [
+            'containerRole'                   => 'region',
+            'containerRoleDescriptionMessage' => 'carousel',
+            'containerMessage'                => 'Featured slides',
+            'itemRoleDescriptionMessage'      => 'slide',
+        ];
         if ($this->owner->Lazy) {
             $o['preloadImages'] = false;
             $o['lazy'] = ['loadPrevNext'=>true,'loadOnTransitionStart'=>true];
@@ -155,7 +165,7 @@ class SwiperSlider extends Extension
 
     public function getSwiperOptionsJSON(): string
     {
-        return json_encode($this->getSwiperOptions(), JSON_UNESCAPED_SLASHES);
+        return json_encode($this->getSwiperOptions(), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP);
     }
 
     public function getHasSlides(): bool

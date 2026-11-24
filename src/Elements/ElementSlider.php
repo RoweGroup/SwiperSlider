@@ -39,6 +39,7 @@ class ElementSlider extends BaseElement
         'Lazy'             => 'Boolean',
         'AutoplayProgress' => 'Boolean',
         'PauseOnMouseEnter' => 'Boolean(1)',
+        'PauseButton'      => 'Boolean(1)',
         'DesktopWidth'     => 'Int',
         'DesktopHeight'    => 'Int',
         'MobileWidth'      => 'Int',
@@ -64,6 +65,7 @@ class ElementSlider extends BaseElement
         $this->AutoplayDelay    = 5000;
         $this->AutoplayProgress = true;
         $this->PauseOnMouseEnter = true;
+        $this->PauseButton      = true;
         $this->DesktopWidth     = 1920;
         $this->DesktopHeight    = 700;
         $this->MobileWidth      = 960;
@@ -86,6 +88,7 @@ class ElementSlider extends BaseElement
             'Lazy',
             'AutoplayProgress',
             'PauseOnMouseEnter',
+            'PauseButton',
             'Slides',
             'DesktopWidth',
             'DesktopHeight',
@@ -125,6 +128,8 @@ class ElementSlider extends BaseElement
                     CheckboxField::create('Autoplay',         'Autoplay'),
                     CheckboxField::create('AutoplayProgress', 'Show autoplay progress indicator'),
                     CheckboxField::create('PauseOnMouseEnter', 'Pause autoplay on hover'),
+                    CheckboxField::create('PauseButton',      'Show pause button')
+                        ->setDescription('Lets visitors stop the autoplay (accessibility, WCAG 2.2.2).'),
                     NumericField::create('AutoplayDelay', 'Autoplay delay (ms)')
                         ->setDescription('Used only when Autoplay is enabled.'),
                     NumericField::create('Speed', 'Transition speed (ms)'),
@@ -159,6 +164,7 @@ class ElementSlider extends BaseElement
         if ($this->Navigation) $o['navigation'] = ['nextEl' => '.swiper-button-next', 'prevEl' => '.swiper-button-prev'];
         if ($this->Scrollbar)  $o['scrollbar']  = ['el' => '.swiper-scrollbar', 'hide' => false];
         if ($this->Autoplay)   $o['autoplay']   = ['delay' => (int) ($this->AutoplayDelay ?: 5000), 'disableOnInteraction' => false, 'pauseOnMouseEnter' => (bool) $this->PauseOnMouseEnter];
+        if ($this->Autoplay && $this->PauseButton) $o['pauseButton'] = true; // theme JS adds a pause/play button
         if ($this->Lazy) {
             $o['preloadImages'] = false;
             $o['lazy'] = ['loadPrevNext' => true, 'loadOnTransitionStart' => true];

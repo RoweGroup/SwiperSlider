@@ -30,6 +30,7 @@ class SwiperSlider extends Extension
         'Lazy'          => 'Boolean',
         'AutoplayProgress' => 'Boolean',
         'PauseOnMouseEnter' => 'Boolean(1)',
+        'PauseButton'   => 'Boolean(1)',
         'DesktopWidth'  => 'Int',
         'DesktopHeight' => 'Int',
         'MobileWidth'   => 'Int',
@@ -49,6 +50,7 @@ class SwiperSlider extends Extension
         $this->owner->AutoplayDelay = 5000;
         $this->owner->AutoplayProgress = true;
         $this->owner->PauseOnMouseEnter = true;
+        $this->owner->PauseButton = true;
         $this->owner->DesktopWidth = 1920;
         $this->owner->DesktopHeight = 700;
         $this->owner->MobileWidth = 960;
@@ -83,6 +85,7 @@ class SwiperSlider extends Extension
             'AutoplayDelay',
             'AutoplayProgress',
             'PauseOnMouseEnter',
+            'PauseButton',
             'Speed',
             'Slides',
             'DesktopWidth',
@@ -115,6 +118,8 @@ class SwiperSlider extends Extension
                 CheckboxField::create('Autoplay', 'Autoplay'),
                 CheckboxField::create('AutoplayProgress', 'Show autoplay progress'),
                 CheckboxField::create('PauseOnMouseEnter', 'Pause autoplay on hover'),
+                CheckboxField::create('PauseButton', 'Show pause button')
+                    ->setDescription('Lets visitors stop the autoplay (accessibility, WCAG 2.2.2).'),
                 NumericField::create('AutoplayDelay', 'Autoplay delay (ms)'),
                 NumericField::create('Speed', 'Transition speed (ms)'),
                 FieldGroup::create('Desktop dimensions',
@@ -140,6 +145,7 @@ class SwiperSlider extends Extension
         if ($this->owner->Navigation) $o['navigation'] = ['nextEl'=>'.swiper-button-next','prevEl'=>'.swiper-button-prev'];
         if ($this->owner->Scrollbar)  $o['scrollbar']  = ['el'=>'.swiper-scrollbar','hide'=>false];
         if ($this->owner->Autoplay)   $o['autoplay']   = ['delay'=>(int)($this->owner->AutoplayDelay ?: 5000),'disableOnInteraction'=>false,'pauseOnMouseEnter'=>(bool)$this->owner->PauseOnMouseEnter];
+        if ($this->owner->Autoplay && $this->owner->PauseButton) $o['pauseButton'] = true; // theme JS adds a pause/play button
         if ($this->owner->Lazy) {
             $o['preloadImages'] = false;
             $o['lazy'] = ['loadPrevNext'=>true,'loadOnTransitionStart'=>true];
